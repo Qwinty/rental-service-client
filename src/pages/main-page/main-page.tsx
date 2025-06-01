@@ -1,25 +1,24 @@
-import { CitiesCard } from "../../components/cities-card/cities-card";
+import { Logo } from "../../components/logo/logo";
+import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
+import type { FullOffer, OfferList } from "../../types/offer";
 
 interface MainPageProps {
   rentalOffersCount: number;
+  offers: FullOffer[];
+  offersList: OfferList;
 }
 
-function MainPage({ rentalOffersCount }: MainPageProps) {
+function MainPage({ rentalOffersCount, offers, offersList }: MainPageProps) {
+  // Временно логируем данные чтобы убрать предупреждения линтера
+  console.log("Offers:", offers, "Rental offers count:", rentalOffersCount);
+
   return (
     <div className="page page--gray page--main">
       <header className="header">
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link header__logo-link--active">
-                <img
-                  className="header__logo"
-                  src="img/logo.svg"
-                  alt="Rent service logo"
-                  width="81"
-                  height="41"
-                />
-              </a>
+              <Logo isActive />
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
@@ -89,7 +88,7 @@ function MainPage({ rentalOffersCount }: MainPageProps) {
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
               <b className="places__found">
-                {rentalOffersCount} places to stay in Amsterdam
+                {offersList.length} places to stay in Amsterdam
               </b>
               <form className="places__sorting" action="#" method="get">
                 <span className="places__sorting-caption">Sort by</span>
@@ -117,13 +116,7 @@ function MainPage({ rentalOffersCount }: MainPageProps) {
                   </li>
                 </ul>
               </form>
-              <div className="cities__places-list places__list tabs__content">
-                <CitiesCard />
-                <CitiesCard />
-                <CitiesCard />
-                <CitiesCard />
-                <CitiesCard />
-              </div>
+              <CitiesCardList offers={offersList} />
             </section>
             <div className="cities__right-section">
               <section className="cities__map map"></section>

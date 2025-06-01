@@ -1,3 +1,7 @@
+import { Logo } from "../../components/logo/logo";
+import { Link } from "react-router-dom";
+import { AppRoute } from "../../const";
+
 function NotFoundPage() {
   return (
     <div className="page page--gray page--login">
@@ -5,15 +9,7 @@ function NotFoundPage() {
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link" href="/">
-                <img
-                  className="header__logo"
-                  src="img/logo.svg"
-                  alt="Rent service logo"
-                  width="81"
-                  height="41"
-                />
-              </a>
+              <Logo />
             </div>
           </div>
         </div>
@@ -23,12 +19,12 @@ function NotFoundPage() {
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">404. Page not found</h1>
-            <a
-              href="main.html"
+            <Link
+              to={AppRoute.Main}
               style={{ textDecoration: "underline", color: "#4481c3" }}
             >
               Go back to main page
-            </a>
+            </Link>
           </section>
         </div>
       </main>
