@@ -1,38 +1,32 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Offer } from "../../types/offer";
 
-interface CitiesCardProps {
+interface NearPlacesCardProps {
   offer: Offer;
   onHover?: (offer: Offer | null) => void;
 }
 
-function CitiesCard({ offer, onHover }: CitiesCardProps) {
+function NearPlacesCard({ offer, onHover }: NearPlacesCardProps) {
   const { id, title, type, price, isPremium, rating, previewImage } = offer;
-  const [isActive, setIsActive] = useState(false);
 
   // Рассчитываем ширину звездочек для рейтинга (рейтинг от 0 до 5, нужно получить проценты)
   const ratingWidth = `${Math.round(rating) * 20}%`;
 
   const handleMouseEnter = () => {
-    setIsActive(true);
     if (onHover) {
       onHover(offer);
     }
-    console.log("Card is active:", isActive);
   };
 
   const handleMouseLeave = () => {
-    setIsActive(false);
     if (onHover) {
       onHover(null);
     }
-    console.log("Card is active:", isActive);
   };
 
   return (
     <article
-      className="cities__card place-card"
+      className="near-places__card place-card"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -41,7 +35,7 @@ function CitiesCard({ offer, onHover }: CitiesCardProps) {
           <span>Premium</span>
         </div>
       )}
-      <div className="cities__image-wrapper place-card__image-wrapper">
+      <div className="near-places__image-wrapper place-card__image-wrapper">
         <Link to={`/offer/${id}`}>
           <img
             className="place-card__image"
@@ -72,7 +66,7 @@ function CitiesCard({ offer, onHover }: CitiesCardProps) {
           </div>
         </div>
         <h2 className="place-card__name">
-          <a href="#">{title}</a>
+          <Link to={`/offer/${id}`}>{title}</Link>
         </h2>
         <p className="place-card__type">{type}</p>
       </div>
@@ -80,4 +74,4 @@ function CitiesCard({ offer, onHover }: CitiesCardProps) {
   );
 }
 
-export { CitiesCard };
+export { NearPlacesCard };

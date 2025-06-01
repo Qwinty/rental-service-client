@@ -51,3 +51,23 @@ export interface FullOffer {
   images: string[];
   maxAdults: number;
 }
+
+// Описывает пользователя, оставившего отзыв
+export interface ReviewUser {
+  id: number;
+  name: string;
+  avatarUrl: string;
+  isPro: boolean;
+}
+
+// Описывает отзыв
+export interface Review {
+  id: string;
+  date: string;
+  user: ReviewUser;
+  comment: string;
+  rating: number;
+}
+
+// Тип для списка отзывов
+export type ReviewList = Review[];

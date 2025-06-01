@@ -67,7 +67,7 @@ export const offers: FullOffer[] = [
       },
     },
     location: {
-      latitude: 52.369553943508,
+      latitude: 52.3609553943508,
       longitude: 4.85309666406198,
       zoom: 8,
     },
@@ -100,16 +100,16 @@ export const offers: FullOffer[] = [
     type: "apartment",
     price: 132,
     city: {
-      name: "Cologne",
+      name: "Amsterdam",
       location: {
-        latitude: 50.9375,
-        longitude: 6.9603,
+        latitude: 52.374,
+        longitude: 4.889,
         zoom: 12,
       },
     },
     location: {
-      latitude: 50.9375553943508,
-      longitude: 6.9603666406198,
+      latitude: 52.3909553943508,
+      longitude: 4.929309666406198,
       zoom: 8,
     },
     isFavorite: false,
@@ -148,16 +148,16 @@ export const offers: FullOffer[] = [
     type: "house",
     price: 180,
     city: {
-      name: "Paris",
+      name: "Amsterdam",
       location: {
-        latitude: 48.8566,
-        longitude: 2.3522,
+        latitude: 52.374,
+        longitude: 4.889,
         zoom: 12,
       },
     },
     location: {
-      latitude: 48.8566553943508,
-      longitude: 2.3522666406198,
+      latitude: 52.3809553943508,
+      longitude: 4.939309666406198,
       zoom: 8,
     },
     isFavorite: true,

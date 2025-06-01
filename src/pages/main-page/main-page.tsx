@@ -1,6 +1,8 @@
-import { Logo } from "../../components/logo/logo";
+import { useState, useMemo } from "react";
+import { Header } from "../../components/header";
 import { CitiesCardList } from "../../components/cities-card-list/cities-card-list";
-import type { FullOffer, OfferList } from "../../types/offer";
+import { Map } from "../../components/map";
+import type { FullOffer, OfferList, Offer } from "../../types/offer";
 
 interface MainPageProps {
   rentalOffersCount: number;
@@ -9,41 +11,29 @@ interface MainPageProps {
 }
 
 function MainPage({ rentalOffersCount, offers, offersList }: MainPageProps) {
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+
   // Временно логируем данные чтобы убрать предупреждения линтера
   console.log("Offers:", offers, "Rental offers count:", rentalOffersCount);
 
+  // Мемоизируем предложения Амстердама для карты
+  const amsterdamOffers = useMemo(
+    () => offers.filter((offer) => offer.city.name === "Amsterdam"),
+    [offers]
+  );
+
+  const handleCardHover = (offer: Offer | null) => {
+    setSelectedOffer(offer);
+  };
+
+  // Находим полное предложение для выбранной карточки
+  const selectedFullOffer = selectedOffer
+    ? amsterdamOffers.find((offer) => offer.id === selectedOffer.id)
+    : undefined;
+
   return (
     <div className="page page--gray page--main">
-      <header className="header">
-        <div className="container">
-          <div className="header__wrapper">
-            <div className="header__left">
-              <Logo isActive />
-            </div>
-            <nav className="header__nav">
-              <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <a
-                    className="header__nav-link header__nav-link--profile"
-                    href="#"
-                  >
-                    <div className="header__avatar-wrapper user__avatar-wrapper"></div>
-                    <span className="header__user-name user__name">
-                      Myemail@gmail.com
-                    </span>
-                    <span className="header__favorite-count">3</span>
-                  </a>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header showUserNav isLogoActive />
 
       <main className="page__main page__main--index">
         <h1 className="visually-hidden">Cities</h1>
@@ -116,10 +106,17 @@ function MainPage({ rentalOffersCount, offers, offersList }: MainPageProps) {
                   </li>
                 </ul>
               </form>
-              <CitiesCardList offers={offersList} />
+              <CitiesCardList
+                offers={offersList}
+                onCardHover={handleCardHover}
+              />
             </section>
             <div className="cities__right-section">
-              <section className="cities__map map"></section>
+              <Map
+                offers={amsterdamOffers}
+                selectedOffer={selectedFullOffer}
+                className="cities__map map"
+              />
             </div>
           </div>
         </div>
