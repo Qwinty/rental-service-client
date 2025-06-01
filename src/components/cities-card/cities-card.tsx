@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import type { Offer } from "../../types/offer";
 
 interface CitiesCardProps {
@@ -5,20 +7,35 @@ interface CitiesCardProps {
 }
 
 function CitiesCard({ offer }: CitiesCardProps) {
-  const { title, type, price, isPremium, rating, previewImage } = offer;
+  const { id, title, type, price, isPremium, rating, previewImage } = offer;
+  const [isActive, setIsActive] = useState(false);
 
   // Рассчитываем ширину звездочек для рейтинга (рейтинг от 0 до 5, нужно получить проценты)
   const ratingWidth = `${Math.round(rating) * 20}%`;
 
+  const handleMouseEnter = () => {
+    setIsActive(true);
+    console.log("Card is active:", isActive);
+  };
+
+  const handleMouseLeave = () => {
+    setIsActive(false);
+    console.log("Card is active:", isActive);
+  };
+
   return (
-    <article className="cities__card place-card">
+    <article
+      className="cities__card place-card"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {isPremium && (
         <div className="place-card__mark">
           <span>Premium</span>
         </div>
       )}
       <div className="cities__image-wrapper place-card__image-wrapper">
-        <a href="#">
+        <Link to={`/offer/${id}`}>
           <img
             className="place-card__image"
             src={previewImage}
@@ -26,7 +43,7 @@ function CitiesCard({ offer }: CitiesCardProps) {
             height="200"
             alt="Place image"
           />
-        </a>
+        </Link>
       </div>
       <div className="place-card__info">
         <div className="place-card__price-wrapper">

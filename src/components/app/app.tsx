@@ -37,10 +37,7 @@ function App({ rentalOffersCount, offers, offersList }: AppProps) {
             </PrivateRoute>
           }
         />
-        <Route
-          path={AppRoute.Offer}
-          element={<OfferPage offer={offers[0]} />}
-        />
+        <Route path={AppRoute.Offer} element={<OfferPage offers={offers} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
