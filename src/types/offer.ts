@@ -2,7 +2,7 @@
 export interface OfferLocation {
   latitude: number;
   longitude: number;
-  zoom: number;
+  zoom?: number;
 }
 
 // Описывает город и его координаты
@@ -25,7 +25,10 @@ export interface Offer {
   title: string;
   type: string;
   price: number;
+  city: CityOffer;
+  location: OfferLocation;
   isPremium: boolean;
+  isFavorite: boolean;
   rating: number;
   previewImage: string;
 }
@@ -50,6 +53,8 @@ export interface FullOffer {
   host: HostOffer;
   images: string[];
   maxAdults: number;
+  maxChildren?: number;
+  previewImage?: string;
 }
 
 // Описывает пользователя, оставившего отзыв
@@ -71,3 +76,49 @@ export interface Review {
 
 // Тип для списка отзывов
 export type ReviewList = Review[];
+
+// Типы для создания нового предложения
+export interface CreateOfferData {
+  title: string;
+  description: string;
+  city: string;
+  type: string;
+  price: number;
+  rooms: number;
+  guests: number;
+  features: string[];
+  latitude: number;
+  longitude: number;
+  isPremium: boolean;
+  previewImage: File;
+  photos: File[];
+}
+
+// Типы для аутентификации
+export interface LoginData {
+  email: string;
+  password: string;
+  [key: string]: string;
+}
+
+export interface RegisterData {
+  username: string;
+  email: string;
+  password: string;
+  userType: "normal" | "pro";
+  avatar?: File;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  userType: "normal" | "pro";
+  avatar?: string;
+}
+
+// Ответ от API авторизации
+export interface AuthResponse {
+  token: string;
+  user: AuthUser;
+}

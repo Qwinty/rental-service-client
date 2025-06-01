@@ -8,9 +8,12 @@ function createOfferFromFull(fullOffer: FullOffer): Offer {
     title: fullOffer.title,
     type: fullOffer.type,
     price: fullOffer.price,
+    city: fullOffer.city,
+    location: fullOffer.location,
     isPremium: fullOffer.isPremium,
+    isFavorite: fullOffer.isFavorite,
     rating: fullOffer.rating,
-    previewImage: fullOffer.images[0], // Берем первое изображение как превью
+    previewImage: fullOffer.previewImage || fullOffer.images[0],
   };
 }
 

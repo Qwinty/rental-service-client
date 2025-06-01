@@ -5,6 +5,7 @@ import { LoginPage } from "../../pages/login-page/login-page";
 import { OfferPage } from "../../pages/offer-page/offer-page";
 import { NotFoundPage } from "../../pages/not-found-page/not-found-page";
 import { PrivateRoute } from "../private-route/private-route";
+import ApiTest from "../api-test";
 import { AppRoute, AuthorizationStatus } from "../../const";
 import type { FullOffer, OfferList } from "../../types/offer";
 
@@ -28,6 +29,7 @@ function App({ rentalOffersCount, offers, offersList }: AppProps) {
           }
         />
         <Route path={AppRoute.Login} element={<LoginPage />} />
+        <Route path={AppRoute.ApiTest} element={<ApiTest />} />
         <Route
           path={AppRoute.Favorites}
           element={
