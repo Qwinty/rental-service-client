@@ -886,7 +886,8 @@ img {
 .places__sorting-caption {
     font-size: 12px;
     line-height: 1.167;
-    font-weight: 700
+    font-weight: 700;
+    margin-right: 0.5rem;
 }
 
 .places__sorting-type {

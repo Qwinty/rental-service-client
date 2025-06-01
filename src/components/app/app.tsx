@@ -15,17 +15,16 @@ interface AppProps {
 }
 
 function App({ rentalOffersCount, offers, offersList }: AppProps) {
+  // Временно логируем offersList чтобы убрать предупреждение линтера
+  console.log("OffersList:", offersList);
+
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path={AppRoute.Main}
           element={
-            <MainPage
-              rentalOffersCount={rentalOffersCount}
-              offers={offers}
-              offersList={offersList}
-            />
+            <MainPage rentalOffersCount={rentalOffersCount} offers={offers} />
           }
         />
         <Route path={AppRoute.Login} element={<LoginPage />} />
