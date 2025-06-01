@@ -172,7 +172,7 @@ function OfferPage({ offers }: OfferPageProps) {
                       <div className="reviews__avatar-wrapper user__avatar-wrapper">
                         <img
                           className="reviews__avatar user__avatar"
-                          src="img/avatar-max.jpg"
+                          src="/img/avatar-max.jpg"
                           width="54"
                           height="54"
                           alt="Reviews avatar"
@@ -333,7 +333,7 @@ function OfferPage({ offers }: OfferPageProps) {
                   <a href="#">
                     <img
                       className="place-card__image"
-                      src="img/room.jpg"
+                      src="/img/room.jpg"
                       width="260"
                       height="200"
                       alt="Place image"
@@ -380,7 +380,7 @@ function OfferPage({ offers }: OfferPageProps) {
                   <a href="#">
                     <img
                       className="place-card__image"
-                      src="img/apartment-02.jpg"
+                      src="/img/apartment-02.jpg"
                       width="260"
                       height="200"
                       alt="Place image"
@@ -427,7 +427,7 @@ function OfferPage({ offers }: OfferPageProps) {
                   <a href="#">
                     <img
                       className="place-card__image"
-                      src="img/apartment-03.jpg"
+                      src="/img/apartment-03.jpg"
                       width="260"
                       height="200"
                       alt="Place image"

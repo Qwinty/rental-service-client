@@ -56,7 +56,7 @@ function FavoritesPage() {
                       <a href="#">
                         <img
                           className="place-card__image"
-                          src="img/apartment-small-03.jpg"
+                          src="/img/apartment-small-03.jpg"
                           width="150"
                           height="110"
                           alt="Place image"
@@ -103,7 +103,7 @@ function FavoritesPage() {
                       <a href="#">
                         <img
                           className="place-card__image"
-                          src="img/room-small.jpg"
+                          src="/img/room-small.jpg"
                           width="150"
                           height="110"
                           alt="Place image"
@@ -161,7 +161,7 @@ function FavoritesPage() {
                       <a href="#">
                         <img
                           className="place-card__image"
-                          src="img/apartment-small-04.jpg"
+                          src="/img/apartment-small-04.jpg"
                           width="150"
                           height="110"
                           alt="Place image"
@@ -212,7 +212,7 @@ function FavoritesPage() {
         <a className="footer__logo-link" href="main.html">
           <img
             className="footer__logo"
-            src="img/logo.svg"
+            src="/img/logo.svg"
             alt="Rent service logo"
             width="64"
             height="33"
