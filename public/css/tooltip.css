@@ -1,0 +1,243 @@
+/* ===================================================================
+   TOOLTIP STYLES
+   =================================================================== */
+
+/* Base tooltip animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================================================
+   BOOKMARK TOOLTIPS
+   =================================================================== */
+
+/* Place card bookmark tooltip */
+.place-card__bookmark-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.place-card__login-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 200px;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    border-radius: 6px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    z-index: 100;
+    margin-top: 10px;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.place-card__login-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 15px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(255, 255, 255, 0.95);
+}
+
+.place-card__login-tooltip p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #383838;
+}
+
+.place-card__login-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background-color: #4481c3;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.place-card__login-button:hover {
+    background-color: #3069a6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(68, 129, 195, 0.3);
+}
+
+/* ===================================================================
+   OFFER PAGE TOOLTIPS
+   =================================================================== */
+
+.offer__bookmark-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: -30px;
+    margin-right: 15px;
+    position: relative;
+}
+
+.offer__login-tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 220px;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    border-radius: 6px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    z-index: 100;
+    margin-top: 10px;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.offer__login-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 15px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(255, 255, 255, 0.95);
+}
+
+.offer__login-tooltip p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #383838;
+}
+
+.offer__login-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background-color: #4481c3;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.offer__login-button:hover {
+    background-color: #3069a6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(68, 129, 195, 0.3);
+}
+
+/* ===================================================================
+   CARD HOVER EFFECTS
+   =================================================================== */
+
+/* Place card image effects */
+.place-card__image-wrapper {
+    overflow: hidden;
+    border-radius: 4px;
+    position: relative;
+}
+
+.place-card__image {
+    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.place-card:hover .place-card__image {
+    transform: scale(1.05);
+}
+
+/* Near places card effects */
+.near-places__image-wrapper {
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.near-places__card .place-card__image {
+    transition: transform 0.3s ease;
+}
+
+.near-places__card:hover .place-card__image {
+    transform: scale(1.05);
+}
+
+/* Override default place-card opacity hover effect */
+.place-card:hover {
+    opacity: 1 !important;
+}
+
+/* ===================================================================
+   RESPONSIVE DESIGN
+   =================================================================== */
+
+@media (max-width: 768px) {
+
+    .place-card__login-tooltip,
+    .offer__login-tooltip {
+        width: 180px;
+        padding: 12px;
+    }
+
+    .place-card__login-tooltip::before,
+    .offer__login-tooltip::before {
+        right: 10px;
+    }
+
+    .place-card__login-tooltip p,
+    .offer__login-tooltip p {
+        font-size: 13px;
+    }
+
+    .place-card__login-button,
+    .offer__login-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .place-card__login-tooltip,
+    .offer__login-tooltip {
+        width: 160px;
+        left: auto;
+        right: -10px;
+    }
+}
