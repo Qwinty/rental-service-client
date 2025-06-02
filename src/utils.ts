@@ -10,10 +10,11 @@ export const getCity = (
 };
 
 // Получает предложения для конкретного города
-export const getOffersByCity = (offers: OfferList): OfferList => {
-  // В реальном приложении здесь была бы фильтрация по городу
-  // Пока возвращаем все предложения
-  return offers;
+export const getOffersByCity = (
+  offers: OfferList,
+  cityName: string
+): OfferList => {
+  return offers.filter((offer) => offer.city.name === cityName);
 };
 
 // Сортирует предложения по выбранному типу

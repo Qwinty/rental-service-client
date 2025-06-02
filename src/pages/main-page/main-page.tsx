@@ -8,37 +8,19 @@ import { useAppDispatch, useAppSelector } from "../../hooks";
 import { changeCity, changeSortType } from "../../store/action";
 import { sortOffers, getOffersByCity } from "../../utils";
 import { CITIES_LOCATION } from "../../const";
-import type { FullOffer, Offer } from "../../types/offer";
+import type { Offer } from "../../types/offer";
 
-interface MainPageProps {
-  rentalOffersCount: number;
-  offers: FullOffer[];
-}
-
-function MainPage({ rentalOffersCount, offers }: MainPageProps) {
+function MainPage() {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
   const dispatch = useAppDispatch();
-  const {
-    city,
-    offers: storeOffers,
-    sortType,
-  } = useAppSelector((state) => state);
-
-  // Временно логируем данные чтобы убрать предупреждения линтера
-  console.log("Offers:", offers, "Rental offers count:", rentalOffersCount);
+  const { city, offers, sortType } = useAppSelector((state) => state);
 
   // Получаем предложения для текущего города и сортируем их
   const cityOffers = useMemo(() => {
-    const filteredOffers = getOffersByCity(storeOffers);
+    const filteredOffers = getOffersByCity(offers, city.name);
     return sortOffers(filteredOffers, sortType);
-  }, [storeOffers, sortType]);
-
-  // Мемоизируем предложения текущего города для карты
-  const cityFullOffers = useMemo(
-    () => offers.filter((offer) => offer.city.name === city.name),
-    [offers, city.name]
-  );
+  }, [offers, city.name, sortType]);
 
   const handleCardHover = (offer: Offer | null) => {
     setSelectedOffer(offer);
@@ -54,7 +36,7 @@ function MainPage({ rentalOffersCount, offers }: MainPageProps) {
 
   // Находим полное предложение для выбранной карточки
   const selectedFullOffer = selectedOffer
-    ? cityFullOffers.find((offer) => offer.id === selectedOffer.id)
+    ? offers.find((offer) => offer.id === selectedOffer.id)
     : undefined;
 
   return (
@@ -86,7 +68,7 @@ function MainPage({ rentalOffersCount, offers }: MainPageProps) {
             </section>
             <div className="cities__right-section">
               <Map
-                offers={cityFullOffers}
+                offers={cityOffers}
                 selectedOffer={selectedFullOffer}
                 className="cities__map map"
               />

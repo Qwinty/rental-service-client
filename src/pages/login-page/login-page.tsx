@@ -1,6 +1,40 @@
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { Header } from "../../components/header";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { loginUser } from "../../store/action";
+import { AppRoute } from "../../const";
 
 function LoginPage() {
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, isLoading, error } = useAppSelector((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    isLoading: state.isLoading,
+    error: state.error,
+  }));
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  console.log("LoginPage render - isAuthenticated:", isAuthenticated);
+
+  // If already authenticated, redirect to main page
+  if (isAuthenticated) {
+    return <Navigate to={AppRoute.Main} replace />;
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log("LoginPage: Login form submitted", { email, password });
+
+    try {
+      await dispatch(loginUser(email, password));
+      console.log("LoginPage: Login successful");
+    } catch (error) {
+      console.error("LoginPage: Login failed:", error);
+    }
+  };
+
   return (
     <div className="page page--gray page--login">
       <Header />
@@ -9,7 +43,7 @@ function LoginPage() {
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">Sign in</h1>
-            <form className="login__form form" action="#" method="post">
+            <form className="login__form form" onSubmit={handleSubmit}>
               <div className="login__input-wrapper form__input-wrapper">
                 <label className="visually-hidden">E-mail</label>
                 <input
@@ -17,6 +51,8 @@ function LoginPage() {
                   type="email"
                   name="email"
                   placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -27,16 +63,55 @@ function LoginPage() {
                   type="password"
                   name="password"
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
               <button
                 className="login__submit form__submit button"
                 type="submit"
+                disabled={isLoading}
               >
-                Sign in
+                {isLoading ? "Signing in..." : "Sign in"}
               </button>
+              {error && (
+                <div style={{ color: "red", marginTop: "10px" }}>
+                  Error: {error}
+                </div>
+              )}
             </form>
+
+            <div
+              className="login__test-credentials"
+              style={{
+                marginTop: "20px",
+                padding: "15px",
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #dee2e6",
+                borderRadius: "4px",
+              }}
+            >
+              <h3
+                style={{
+                  margin: "0 0 10px 0",
+                  fontSize: "14px",
+                  color: "#6c757d",
+                }}
+              >
+                Test Login Credentials:
+              </h3>
+              <p
+                style={{ margin: "5px 0", fontSize: "12px", color: "#495057" }}
+              >
+                <strong>Email:</strong> testuser@email.com
+              </p>
+              <p
+                style={{ margin: "5px 0", fontSize: "12px", color: "#495057" }}
+              >
+                <strong>Password:</strong> testuser1
+              </p>
+            </div>
           </section>
           <section className="locations locations--login locations--current">
             <div className="locations__item">

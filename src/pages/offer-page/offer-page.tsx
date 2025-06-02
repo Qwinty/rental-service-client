@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "../../components/header";
 import { NotFoundPage } from "../not-found-page/not-found-page";
@@ -6,54 +6,135 @@ import { ReviewsList } from "../../components/reviews-list";
 import { CommentForm } from "../../components/comment-form";
 import { Map } from "../../components/map";
 import { NearPlacesCard } from "../../components/near-places-card";
-import type { FullOffer, Offer } from "../../types/offer";
-import { reviews } from "../../mocks/reviews";
-import { offersList } from "../../mocks/offers-list";
+import { ImageGallery } from "../../components/image-gallery";
+import { useAppSelector } from "../../hooks";
+import { offerApi, reviewApi } from "../../services";
+import type { FullOffer, Offer, ReviewList } from "../../types/offer";
 
-interface OfferPageProps {
-  offers: FullOffer[];
-}
-
-function OfferPage({ offers }: OfferPageProps) {
+function OfferPage() {
   const { id } = useParams<{ id: string }>();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [fullOffer, setFullOffer] = useState<FullOffer | null>(null);
+  const [reviews, setReviews] = useState<ReviewList>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Находим предложение по ID из URL
-  const offer = offers.find((item) => item.id === id);
+  const { offers, user, isAuthenticated } = useAppSelector((state) => state);
 
-  // Мемоизируем предложения неподалеку
-  const nearbyOffers = useMemo(
-    () => offersList.filter((nearbyOffer) => nearbyOffer.id !== id).slice(0, 3),
-    [id]
-  );
+  // Загружаем полную информацию о предложении при изменении ID
+  useEffect(() => {
+    if (!id) return;
+
+    const loadOffer = async () => {
+      try {
+        setIsLoading(true);
+        const offer = await offerApi.getOfferById(id);
+        setFullOffer(offer);
+      } catch (error) {
+        console.error("Failed to load offer:", error);
+        setFullOffer(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadOffer();
+  }, [id]);
+
+  // Загружаем отзывы для предложения
+  useEffect(() => {
+    if (!id) return;
+
+    const loadReviews = async () => {
+      try {
+        const reviewsData = await reviewApi.getReviewsByOfferId(id);
+        setReviews(reviewsData);
+      } catch (error) {
+        console.error("Failed to load reviews:", error);
+        setReviews([]);
+      }
+    };
+
+    loadReviews();
+  }, [id]);
+
+  // Мемоизируем предложения неподалеку (из существующих в store)
+  const nearbyOffers = useMemo(() => {
+    if (!fullOffer) return [];
+    return offers
+      .filter(
+        (offer) => offer.id !== id && offer.city.name === fullOffer.city.name
+      )
+      .slice(0, 3);
+  }, [offers, fullOffer, id]);
 
   // Мемоизируем данные для карты
   const mapOffers = useMemo(() => {
-    if (!offer) return [];
-    return [
-      offer,
-      ...offers.filter((fullOffer) =>
-        nearbyOffers.some((nearby) => nearby.id === fullOffer.id)
-      ),
-    ];
-  }, [offer, offers, nearbyOffers]);
+    if (!fullOffer) return [];
+    // Конвертируем FullOffer в Offer для Map
+    const mainOffer: Offer = {
+      id: fullOffer.id,
+      title: fullOffer.title,
+      type: fullOffer.type,
+      price: fullOffer.price,
+      city: fullOffer.city,
+      location: fullOffer.location,
+      isPremium: fullOffer.isPremium,
+      isFavorite: fullOffer.isFavorite,
+      rating: fullOffer.rating,
+      previewImage: fullOffer.previewImage || fullOffer.images[0],
+    };
+
+    return [mainOffer, ...nearbyOffers];
+  }, [fullOffer, nearbyOffers]);
 
   const handleNearbyCardHover = (hoveredOffer: Offer | null) => {
     setSelectedOffer(hoveredOffer);
   };
 
-  // Находим полное предложение для выбранной карточки
-  const selectedFullOffer = selectedOffer
-    ? offers.find((fullOffer) => fullOffer.id === selectedOffer.id)
-    : undefined;
+  const handleCommentSubmit = async (comment: string, rating: number) => {
+    if (!id) {
+      throw new Error("Offer ID is missing");
+    }
 
-  const handleCommentSubmit = (comment: string, rating: number) => {
-    console.log("New review:", { comment, rating });
-    // Здесь будет логика отправки отзыва
+    if (!isAuthenticated || !user) {
+      throw new Error("You must be logged in to submit a review");
+    }
+
+    try {
+      // Отправляем отзыв через API
+      const newReview = await reviewApi.addReview(id, {
+        comment,
+        rating,
+      });
+
+      // Обновляем список отзывов
+      setReviews((prevReviews) => [newReview, ...prevReviews]);
+
+      console.log("Review submitted successfully:", newReview);
+    } catch (error) {
+      console.error("Failed to submit review:", error);
+      // Проброс ошибки для обработки в модальном окне
+      throw error;
+    }
   };
 
+  // Показываем loading
+  if (isLoading) {
+    return (
+      <div className="page">
+        <Header showUserNav />
+        <main className="page__main page__main--offer">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Загрузка предложения...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   // Если предложение не найдено, показываем страницу 404
-  if (!offer) {
+  if (!fullOffer) {
     return <NotFoundPage />;
   }
 
@@ -69,7 +150,7 @@ function OfferPage({ offers }: OfferPageProps) {
     host,
     images,
     maxAdults,
-  } = offer;
+  } = fullOffer;
 
   // Рассчитываем ширину звездочек для рейтинга (рейтинг от 0 до 5, нужно получить проценты)
   const ratingWidth = `${Math.round(rating) * 20}%`;
@@ -80,19 +161,8 @@ function OfferPage({ offers }: OfferPageProps) {
 
       <main className="page__main page__main--offer">
         <section className="offer">
-          <div className="offer__gallery-container container">
-            <div className="offer__gallery">
-              {images.map((image, index) => (
-                <div key={`image-${index}`} className="offer__image-wrapper">
-                  <img
-                    className="offer__image"
-                    src={image}
-                    alt="Photo studio"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ImageGallery images={images} title={title} />
+
           <div className="offer__container container">
             <div className="offer__wrapper">
               {isPremium && (
@@ -176,7 +246,7 @@ function OfferPage({ offers }: OfferPageProps) {
           </div>
           <Map
             offers={mapOffers}
-            selectedOffer={selectedFullOffer}
+            selectedOffer={selectedOffer || undefined}
             className="offer__map map"
           />
         </section>

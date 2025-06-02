@@ -3,23 +3,17 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import "leaflet/dist/leaflet.css";
 import { App } from "./components/app/app";
-import { RENTAL_OFFERS_COUNT } from "./const";
-import { offers } from "./mocks/offers";
-import { offersList } from "./mocks/offers-list";
 import { store } from "./store";
+import { offersList } from "./mocks/offers-list";
 import { loadOffers } from "./store/action";
 
-// Загружаем тестовые данные в store
+// Загружаем тестовые данные в store при инициализации
 store.dispatch(loadOffers(offersList));
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <App
-        rentalOffersCount={RENTAL_OFFERS_COUNT}
-        offers={offers}
-        offersList={offersList}
-      />
+      <App />
     </Provider>
   </StrictMode>
 );

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import type { Offer } from "../../types/offer";
+import type { RootState, AppDispatch } from "../../store";
+import {
+  addOfferToFavorites,
+  removeOfferFromFavorites,
+} from "../../store/action";
 
 interface CitiesCardProps {
   offer: Offer;
@@ -8,8 +14,23 @@ interface CitiesCardProps {
 }
 
 function CitiesCard({ offer, onHover }: CitiesCardProps) {
-  const { id, title, type, price, isPremium, rating, previewImage } = offer;
+  const {
+    id,
+    title,
+    type,
+    price,
+    isPremium,
+    rating,
+    previewImage,
+    isFavorite,
+  } = offer;
   const [isActive, setIsActive] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated, isLoading } = useSelector((state: RootState) => ({
+    isAuthenticated: state.isAuthenticated,
+    isLoading: state.isLoading,
+  }));
 
   // Рассчитываем ширину звездочек для рейтинга (рейтинг от 0 до 5, нужно получить проценты)
   const ratingWidth = `${Math.round(rating) * 20}%`;
@@ -28,6 +49,25 @@ function CitiesCard({ offer, onHover }: CitiesCardProps) {
       onHover(null);
     }
     console.log("Card is active:", isActive);
+  };
+
+  const handleFavoriteToggle = () => {
+    if (!isAuthenticated) {
+      // Optionally redirect to login or show a message
+      console.log("User must be authenticated to add favorites");
+      return;
+    }
+
+    if (isLoading) {
+      // Prevent multiple clicks while API call is in progress
+      return;
+    }
+
+    if (isFavorite) {
+      dispatch(removeOfferFromFavorites(id));
+    } else {
+      dispatch(addOfferToFavorites(id));
+    }
   };
 
   return (
@@ -58,11 +98,20 @@ function CitiesCard({ offer, onHover }: CitiesCardProps) {
             <b className="place-card__price-value">&euro;{price}</b>
             <span className="place-card__price-text">&#47;&nbsp;night</span>
           </div>
-          <button className="place-card__bookmark-button button" type="button">
+          <button
+            className={`place-card__bookmark-button button ${
+              isFavorite ? "place-card__bookmark-button--active" : ""
+            }`}
+            type="button"
+            onClick={handleFavoriteToggle}
+            disabled={!isAuthenticated || isLoading}
+          >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use href="#icon-bookmark"></use>
             </svg>
-            <span className="visually-hidden">To bookmarks</span>
+            <span className="visually-hidden">
+              {isFavorite ? "Remove from bookmarks" : "Add to bookmarks"}
+            </span>
           </button>
         </div>
         <div className="place-card__rating rating">

@@ -16,9 +16,10 @@ class OfferApi extends ApiService {
     return this.get<FullOffer>(`/offers/${id}`);
   }
 
-  // Получить избранные предложения
+  // Получить избранные предложения (для текущего пользователя)
   async getFavoriteOffers(): Promise<OfferList> {
-    return this.get<OfferList>("/offers/favorite");
+    // Updated endpoint to match server
+    return this.get<OfferList>("/offers/favorites/list");
   }
 
   // Создать новое предложение
@@ -36,9 +37,6 @@ class OfferApi extends ApiService {
     formData.append("latitude", offerData.latitude.toString());
     formData.append("longitude", offerData.longitude.toString());
     formData.append("isPremium", offerData.isPremium.toString());
-    formData.append("isFavorite", "false");
-    formData.append("rating", "1");
-    formData.append("commentsCount", "0");
 
     // Добавляем features как JSON строку
     formData.append("features", JSON.stringify(offerData.features));
@@ -54,13 +52,14 @@ class OfferApi extends ApiService {
     return this.post<FullOffer>("/offers", formData);
   }
 
-  // Добавить/удалить из избранного
-  async toggleFavorite(
-    offerId: string,
-    isFavorite: boolean
-  ): Promise<FullOffer> {
-    const status = isFavorite ? "1" : "0";
-    return this.post<FullOffer>(`/offers/favorite/${offerId}/${status}`);
+  // Добавить предложение в избранное
+  async addFavoriteOffer(offerId: string): Promise<FullOffer> {
+    return this.post<FullOffer>(`/offers/${offerId}/favorite`);
+  }
+
+  // Удалить предложение из избранного
+  async removeFavoriteOffer(offerId: string): Promise<FullOffer> {
+    return this.delete<FullOffer>(`/offers/${offerId}/favorite`);
   }
 }
 

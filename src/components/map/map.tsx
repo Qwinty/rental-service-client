@@ -1,22 +1,20 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
-import type { FullOffer } from "../../types/offer";
+import type { Offer } from "../../types/offer";
 
 interface MapProps {
-  offers: FullOffer[];
-  selectedOffer?: FullOffer;
+  offers: Offer[];
+  selectedOffer?: Offer;
   className?: string;
 }
 
 const DEFAULT_CUSTOM_ICON = L.icon({
   iconUrl: "/img/pin.svg",
-  iconSize: [40, 40],
   iconAnchor: [20, 40],
 });
 
 const CURRENT_CUSTOM_ICON = L.icon({
   iconUrl: "/img/pin-active.svg",
-  iconSize: [40, 40],
   iconAnchor: [20, 40],
 });
 

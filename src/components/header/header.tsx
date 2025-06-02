@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Logo } from "../logo/logo";
 import { UserNav } from "../user-nav";
 import { AppRoute } from "../../const";
+import { useAppSelector } from "../../hooks";
 
 interface HeaderProps {
   showUserNav?: boolean;
@@ -9,6 +10,18 @@ interface HeaderProps {
 }
 
 function Header({ showUserNav = false, isLogoActive = false }: HeaderProps) {
+  const { isAuthenticated, user } = useAppSelector((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    user: state.user,
+  }));
+
+  console.log(
+    "Header: Header render - isAuthenticated:",
+    isAuthenticated,
+    "user:",
+    user
+  );
+
   return (
     <header className="header">
       <div className="container">
@@ -25,12 +38,34 @@ function Header({ showUserNav = false, isLogoActive = false }: HeaderProps) {
                 padding: "5px 10px",
                 border: "1px solid #4481c3",
                 borderRadius: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               🔧 Test API
             </Link>
           </div>
-          {showUserNav && <UserNav />}
+          {showUserNav && (
+            <>
+              {isAuthenticated && user ? (
+                <UserNav userEmail={user.email} favoriteCount={0} />
+              ) : (
+                <nav className="header__nav">
+                  <ul className="header__nav-list">
+                    <li className="header__nav-item">
+                      <Link
+                        className="header__nav-link header__signin-button"
+                        to={AppRoute.Login}
+                      >
+                        <span className="header__signin">Sign in</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </nav>
+              )}
+            </>
+          )}
         </div>
       </div>
     </header>
