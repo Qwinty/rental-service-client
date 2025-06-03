@@ -36,7 +36,8 @@ export const useServerStatus = () => {
             WAKE_UP_TIMEOUT
           );
 
-          const response = await fetch(`${API_BASE_URL}/health`, {
+          const healthUrl = API_BASE_URL.replace("/api", "") + "/health";
+          const response = await fetch(healthUrl, {
             method: "GET",
             signal: controller.signal,
             headers: {

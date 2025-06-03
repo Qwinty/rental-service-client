@@ -47,15 +47,14 @@ const attemptServerWakeUp = async (retries = 3): Promise<boolean> => {
 
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(
-        `${API_BASE_URL.replace("/api", "")}/health`,
-        {
-          method: "GET",
-          headers: {
-            "Cache-Control": "no-cache",
-          },
-        }
-      );
+      // Use the root health endpoint
+      const healthUrl = API_BASE_URL.replace("/api", "") + "/health";
+      const response = await fetch(healthUrl, {
+        method: "GET",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
 
       if (response.ok) {
         serverWakeUpInProgress = false;
