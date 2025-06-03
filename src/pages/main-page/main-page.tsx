@@ -4,6 +4,7 @@ import { CitiesCardList } from "../../components/cities-card-list/cities-card-li
 import { CitiesList } from "../../components/cities-list/cities-list";
 import { SortOptions } from "../../components/sort-options/sort-options";
 import { Map } from "../../components/map";
+import { SkeletonCardList } from "../../components/skeleton-card";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { changeCity, changeSortType } from "../../store/action";
 import { sortOffers, getOffersByCity } from "../../utils";
@@ -14,7 +15,9 @@ function MainPage() {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
   const dispatch = useAppDispatch();
-  const { city, offers, sortType } = useAppSelector((state) => state);
+  const { city, offers, sortType, isLoading } = useAppSelector(
+    (state) => state
+  );
 
   // Получаем предложения для текущего города и сортируем их
   const cityOffers = useMemo(() => {
@@ -39,6 +42,10 @@ function MainPage() {
     ? offers.find((offer) => offer.id === selectedOffer.id)
     : undefined;
 
+  // Определяем, показывать ли загрузку (если загружается или нет предложений для города)
+  const shouldShowLoading =
+    isLoading || (cityOffers.length === 0 && offers.length === 0);
+
   return (
     <div className="page page--gray page--main">
       <Header showUserNav isLogoActive />
@@ -55,21 +62,31 @@ function MainPage() {
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
               <b className="places__found">
-                {cityOffers.length} places to stay in {city.name}
+                {shouldShowLoading
+                  ? `Loading places in ${city.name}...`
+                  : `${cityOffers.length} places to stay in ${city.name}`}
               </b>
-              <SortOptions
-                currentSortType={sortType}
-                onSortTypeChange={handleSortTypeChange}
-              />
-              <CitiesCardList
-                offers={cityOffers}
-                onCardHover={handleCardHover}
-              />
+              {!shouldShowLoading && (
+                <SortOptions
+                  currentSortType={sortType}
+                  onSortTypeChange={handleSortTypeChange}
+                />
+              )}
+              {shouldShowLoading ? (
+                <SkeletonCardList count={6} />
+              ) : (
+                <CitiesCardList
+                  offers={cityOffers}
+                  onCardHover={handleCardHover}
+                />
+              )}
             </section>
             <div className="cities__right-section">
               <Map
-                offers={cityOffers}
-                selectedOffer={selectedFullOffer}
+                offers={shouldShowLoading ? [] : cityOffers}
+                selectedOffer={
+                  shouldShowLoading ? undefined : selectedFullOffer
+                }
                 className="cities__map map"
               />
             </div>

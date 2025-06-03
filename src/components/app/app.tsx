@@ -7,6 +7,9 @@ import { RegisterPage } from "../../pages/register-page";
 import { OfferPage } from "../../pages/offer-page/offer-page";
 import { NotFoundPage } from "../../pages/not-found-page/not-found-page";
 import { PrivateRoute } from "../private-route/private-route";
+import { ServerStatusProvider } from "../../contexts/ServerStatusContext";
+import { ServerLoading } from "../server-loading/server-loading";
+import { ServerStatusIndicator } from "../server-status-indicator/server-status-indicator";
 import ApiTest from "../api-test";
 import { AppRoute, AuthorizationStatus } from "../../const";
 import { useAppDispatch, useAppSelector } from "../../hooks";
@@ -64,41 +67,51 @@ function App() {
   console.log("App - Auth status for PrivateRoute:", authStatus);
 
   return (
-    <BrowserRouter>
-      {isLoading && (
-        <div
-          style={{
-            position: "fixed",
-            top: "10px",
-            right: "10px",
-            background: "#4481c3",
-            color: "white",
-            padding: "5px 10px",
-            borderRadius: "4px",
-            zIndex: 1000,
-          }}
-        >
-          Загрузка...
-        </div>
-      )}
+    <ServerStatusProvider>
+      <BrowserRouter>
+        {/* Server Loading Screen */}
+        <ServerLoading />
 
-      <Routes>
-        <Route path={AppRoute.Main} element={<MainPage />} />
-        <Route path={AppRoute.Login} element={<LoginPage />} />
-        <Route path={AppRoute.Register} element={<RegisterPage />} />
-        <Route path={AppRoute.ApiTest} element={<ApiTest />} />
-        <Route
-          path={AppRoute.Favorites}
-          element={
-            <PrivateRoute authorizationStatus={authStatus}>
-              <FavoritesPage />
-            </PrivateRoute>
-          }
-        />
-        <Route path={AppRoute.Offer} element={<OfferPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter>
+        {/* Server Status Indicator */}
+        <ServerStatusIndicator />
+
+        {/* App Loading Indicator */}
+        {isLoading && (
+          <div
+            style={{
+              position: "fixed",
+              top: "60px",
+              right: "20px",
+              background: "#4481c3",
+              color: "white",
+              padding: "5px 10px",
+              borderRadius: "4px",
+              zIndex: 999,
+              fontSize: "12px",
+            }}
+          >
+            Загрузка данных...
+          </div>
+        )}
+
+        <Routes>
+          <Route path={AppRoute.Main} element={<MainPage />} />
+          <Route path={AppRoute.Login} element={<LoginPage />} />
+          <Route path={AppRoute.Register} element={<RegisterPage />} />
+          <Route path={AppRoute.ApiTest} element={<ApiTest />} />
+          <Route
+            path={AppRoute.Favorites}
+            element={
+              <PrivateRoute authorizationStatus={authStatus}>
+                <FavoritesPage />
+              </PrivateRoute>
+            }
+          />
+          <Route path={AppRoute.Offer} element={<OfferPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </ServerStatusProvider>
   );
 }
 

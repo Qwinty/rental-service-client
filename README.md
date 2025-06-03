@@ -1,54 +1,82 @@
-# React + TypeScript + Vite
+# Six Cities Rental Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern single-page application for browsing short‑term rental offers across multiple European cities. Built with **React 19**, **TypeScript**, **Vite** and **Redux Toolkit**, the client consumes a REST API and provides an Airbnb‑like experience with interactive maps, favourites and reviews.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* 🔍 **City switcher** – quickly browse offers in different cities via tab navigation.
+* 🗺️ **Interactive map** powered by Leaflet – highlights the active offer and nearby places.
+* 🧑‍💼 **Authentication & roles** – registration, login and protected routes for authorised users.
+* ⭐ **Favourites** – bookmark offers and keep them in sync across devices.
+* 💬 **Reviews** – read and post ratings with real‑time validation.
+* ⚡ **Skeleton loaders & tooltips** for a polished perceived performance.
+* 📱 **Responsive design** – works great on mobile, tablet and desktop.
 
-## Expanding the ESLint configuration
+## Tech stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Layer   | Library / Tool                  |
+| ------- | ------------------------------- |
+| UI      | React 19, React Router DOM 7    |
+| State   | Redux Toolkit 2 + React‑Redux 9 |
+| Styling | CSS Modules (vanilla CSS)       |
+| Maps    | Leaflet 1.9 & @types/leaflet    |
+| Tooling | Vite 6, TypeScript 5, ESLint    |
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+> The dev server runs on **[http://localhost:3000](http://localhost:3000)** and proxies API requests to **[http://localhost:5000](http://localhost:5000)** out of the box ("/api" & "/static" paths) – see `vite.config.ts`.
+
+## Getting started
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-org/your-repo.git
+cd your-repo
+
+# 2. Install dependencies
+npm install         # or pnpm install / yarn
+
+# 3. Provide API url (optional)
+echo "VITE_API_URL=https://api.example.com" > .env.local
+
+# 4. Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Available scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Command           | Purpose                                |
+| ----------------- | -------------------------------------- |
+| `npm run dev`     | Start Vite dev server with HMR         |
+| `npm run build`   | Production build (type‑check + bundle) |
+| `npm run preview` | Preview built assets                   |
+| `npm run lint`    | Lint all source files                  |
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## Folder structure
+
+```folder_structure
+src/
+├── components/      # Re‑usable UI blocks
+├── pages/           # Route‑level components
+├── hooks/           # Typed hooks for Redux
+├── services/        # API wrappers (REST)
+├── store/           # Redux root reducer & actions
+├── types/           # Shared TypeScript types
+└── utils.ts         # Pure utility functions
+public/              # Static assets & icons
 ```
+
+## Environment variables
+
+| Variable       | Default                     | Description              |
+| -------------- | --------------------------- | ------------------------ |
+| `VITE_API_URL` | `http://localhost:5000/api` | Base URL for backend API |
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch `git checkout -b feature/amazing`
+3. Commit your changes (`npm run lint` must pass)
+4. Open a Pull Request
+
+## License
+
+MIT – see `LICENSE` file for details.
