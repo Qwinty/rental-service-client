@@ -5,6 +5,7 @@ import { CitiesList } from "../../components/cities-list/cities-list";
 import { SortOptions } from "../../components/sort-options/sort-options";
 import { Map } from "../../components/map";
 import { SkeletonCardList } from "../../components/skeleton-card";
+import { ImageCacheDebug } from "../../components/image-cache-debug/image-cache-debug";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { changeCity, changeSortType } from "../../store/action";
 import { sortOffers, getOffersByCity } from "../../utils";
@@ -93,6 +94,9 @@ function MainPage() {
           </div>
         </div>
       </main>
+
+      {/* Image cache debug - only show in development */}
+      {window.location.hostname === "localhost" && <ImageCacheDebug />}
     </div>
   );
 }

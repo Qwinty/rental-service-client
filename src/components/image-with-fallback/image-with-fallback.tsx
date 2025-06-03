@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface ImageWithFallbackProps {
   src: string;
@@ -9,6 +9,126 @@ interface ImageWithFallbackProps {
   fallbackSrc?: string;
   lazy?: boolean;
   onClick?: () => void;
+}
+
+// Simple image cache using Map for memory and localStorage for persistence
+const imageCache = new Map<string, HTMLImageElement>();
+const loadingPromises = new Map<string, Promise<HTMLImageElement>>();
+
+// Cache utilities
+const CACHE_PREFIX = "img_cache_";
+const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+
+function getCacheKey(src: string): string {
+  return btoa(src).replace(/[/+=]/g, "_");
+}
+
+function isValidCacheEntry(timestamp: number): boolean {
+  return Date.now() - timestamp < MAX_AGE;
+}
+
+function getCachedFromStorage(key: string): string | null {
+  try {
+    const cached = localStorage.getItem(CACHE_PREFIX + key);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (isValidCacheEntry(parsed.timestamp)) {
+        return parsed.dataUrl;
+      } else {
+        localStorage.removeItem(CACHE_PREFIX + key);
+      }
+    }
+  } catch (error) {
+    console.warn("Error reading from cache:", error);
+  }
+  return null;
+}
+
+function saveToStorage(key: string, dataUrl: string): void {
+  try {
+    const data = { dataUrl, timestamp: Date.now() };
+    localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
+  } catch (error) {
+    console.warn("Error saving to cache:", error);
+  }
+}
+
+function imageToDataUrl(img: HTMLImageElement): string {
+  try {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return "";
+
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+    return canvas.toDataURL("image/jpeg", 0.8);
+  } catch (error) {
+    console.warn("Error converting image to data URL:", error);
+    return "";
+  }
+}
+
+async function loadImageWithCache(src: string): Promise<HTMLImageElement> {
+  const key = getCacheKey(src);
+
+  // Check memory cache
+  if (imageCache.has(key)) {
+    return Promise.resolve(imageCache.get(key)!);
+  }
+
+  // Check if already loading
+  if (loadingPromises.has(key)) {
+    return loadingPromises.get(key)!;
+  }
+
+  // Check localStorage
+  const cachedDataUrl = getCachedFromStorage(key);
+  if (cachedDataUrl) {
+    const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        imageCache.set(key, img);
+        resolve(img);
+      };
+      img.onerror = () => {
+        localStorage.removeItem(CACHE_PREFIX + key);
+        reject(new Error("Cached image failed to load"));
+      };
+      img.src = cachedDataUrl;
+    });
+
+    loadingPromises.set(key, promise);
+    promise.finally(() => loadingPromises.delete(key));
+    return promise;
+  }
+
+  // Load from network
+  const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    img.onload = () => {
+      try {
+        const dataUrl = imageToDataUrl(img);
+        if (dataUrl) {
+          saveToStorage(key, dataUrl);
+        }
+        imageCache.set(key, img);
+        resolve(img);
+      } catch (error) {
+        console.warn("Error caching image:", error);
+        resolve(img);
+      }
+    };
+
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = src;
+  });
+
+  loadingPromises.set(key, promise);
+  promise.finally(() => loadingPromises.delete(key));
+  return promise;
 }
 
 function ImageWithFallback({
@@ -24,26 +144,47 @@ function ImageWithFallback({
   const [currentSrc, setCurrentSrc] = useState<string>(lazy ? "" : src);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
-  const mainDivRef = useRef<HTMLDivElement>(null); // Ref for the main wrapper div
+  const [cachedImageSrc, setCachedImageSrc] = useState<string>("");
+  const mainDivRef = useRef<HTMLDivElement>(null);
+
+  const loadImageFromCache = useCallback(
+    async (imageSrc: string) => {
+      try {
+        setIsLoading(true);
+        setHasError(false);
+
+        const img = await loadImageWithCache(imageSrc);
+        setCachedImageSrc(img.src);
+        setIsLoading(false);
+      } catch (error) {
+        console.warn("Failed to load image:", imageSrc, error);
+        if (imageSrc !== fallbackSrc && fallbackSrc) {
+          setHasError(true);
+          setCurrentSrc(fallbackSrc);
+        } else {
+          setIsLoading(false);
+          setHasError(true);
+        }
+      }
+    },
+    [fallbackSrc]
+  );
 
   useEffect(() => {
     if (!lazy) {
       setCurrentSrc(src);
-      // For non-lazy images, if src is already there, we might not need to show loading for long
-      // or depend on onLoad. But for consistency, let's keep setIsLoading(true) initially.
       return;
     }
 
     let observer: IntersectionObserver | null = null;
-    const currentMainDiv = mainDivRef.current; // Capture current value for cleanup
+    const currentMainDiv = mainDivRef.current;
 
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries;
       if (entry.isIntersecting) {
-        setIsLoading(true); // Ensure loading is true when we start loading src
         setCurrentSrc(src);
         if (observer && currentMainDiv) {
-          observer.unobserve(currentMainDiv); // Stop observing once intersected
+          observer.unobserve(currentMainDiv);
         }
       }
     };
@@ -61,37 +202,16 @@ function ImageWithFallback({
         observer.disconnect();
       }
     };
-  }, [src, lazy]); // mainDivRef.current is stable, no need to include as dependency
+  }, [src, lazy]);
 
   useEffect(() => {
-    // Reset isLoading to true when src/currentSrc changes,
-    // unless it's the initial empty string for lazy loading.
-    if (currentSrc && currentSrc !== fallbackSrc) {
-      setIsLoading(true);
-      setHasError(false);
+    if (currentSrc && currentSrc !== "") {
+      loadImageFromCache(currentSrc);
     } else if (!currentSrc && lazy) {
-      // Initial state for lazy loading, placeholder should be visible
       setIsLoading(true);
       setHasError(false);
     }
-  }, [currentSrc, lazy, fallbackSrc]);
-
-  const handleLoad = () => {
-    setIsLoading(false);
-    setHasError(false);
-  };
-
-  const handleError = () => {
-    if (currentSrc !== fallbackSrc && fallbackSrc) {
-      setCurrentSrc(fallbackSrc);
-      setHasError(true); // Keep it true to indicate an issue occurred
-      setIsLoading(true); // We are now trying to load the fallback
-    } else {
-      // Fallback also failed or no fallbackSrc
-      setIsLoading(false);
-      setHasError(true);
-    }
-  };
+  }, [currentSrc, lazy, loadImageFromCache]);
 
   return (
     <div
@@ -100,39 +220,34 @@ function ImageWithFallback({
       onClick={onClick}
       style={{ cursor: onClick ? "pointer" : "default", width, height }}
     >
-      {isLoading &&
-        (!currentSrc || currentSrc === src || currentSrc === fallbackSrc) && (
+      {isLoading && (!currentSrc || !cachedImageSrc) && (
+        <div
+          className="image-placeholder"
+          style={{ width: "100%", height: "100%" }}
+        >
           <div
-            className="image-placeholder"
+            className="image-skeleton"
             style={{ width: "100%", height: "100%" }}
-          >
-            <div
-              className="image-skeleton"
-              style={{ width: "100%", height: "100%" }}
-            ></div>
-          </div>
-        )}
+          ></div>
+        </div>
+      )}
 
-      {currentSrc && (
+      {cachedImageSrc && (
         <img
-          src={currentSrc}
+          src={cachedImageSrc}
           alt={alt}
-          // width and height props are applied to the wrapper div for layout control
-          // img tag itself will fill the wrapper
-          className={className} // Apply className to img as well if needed for specific img styling
-          onLoad={handleLoad}
-          onError={handleError}
+          className={className}
           style={{
             display: isLoading ? "none" : "block",
-            opacity: hasError && currentSrc === fallbackSrc ? 0.7 : 1, // Dim if showing fallback
+            opacity: hasError && currentSrc === fallbackSrc ? 0.7 : 1,
             width: "100%",
             height: "100%",
-            objectFit: "cover", // Ensure image covers the area
+            objectFit: "cover",
           }}
         />
       )}
 
-      {hasError && !isLoading && (
+      {hasError && !isLoading && !cachedImageSrc && (
         <div
           className="image-error-overlay"
           style={{ width: "100%", height: "100%" }}

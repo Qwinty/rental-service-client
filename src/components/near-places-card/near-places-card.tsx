@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { ImageWithFallback } from "../image-with-fallback/image-with-fallback";
 import type { Offer } from "../../types/offer";
 import type { RootState, AppDispatch } from "../../store";
 import {
@@ -79,12 +80,13 @@ function NearPlacesCard({ offer, onHover }: NearPlacesCardProps) {
       )}
       <div className="near-places__image-wrapper place-card__image-wrapper">
         <Link to={`/offer/${id}`}>
-          <img
-            className="place-card__image"
+          <ImageWithFallback
             src={previewImage}
-            width="260"
-            height="200"
             alt="Place image"
+            width={260}
+            height={200}
+            className="place-card__image"
+            lazy={true}
           />
         </Link>
       </div>

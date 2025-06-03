@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Header } from "../../components/header";
 import { Footer } from "../../components/footer";
+import { ImageWithFallback } from "../../components/image-with-fallback/image-with-fallback";
 import type { RootState, AppDispatch } from "../../store";
 import {
   fetchFavoriteOffers,
@@ -204,12 +205,13 @@ function FavoritesPage() {
                         )}
                         <div className="favorites__image-wrapper place-card__image-wrapper">
                           <Link to={`/offer/${offer.id}`}>
-                            <img
-                              className="place-card__image"
+                            <ImageWithFallback
                               src={offer.previewImage}
-                              width="150"
-                              height="110"
                               alt="Place image"
+                              width={150}
+                              height={110}
+                              className="place-card__image"
+                              lazy={true}
                             />
                           </Link>
                         </div>
